@@ -1,0 +1,15 @@
+{
+  "id": "scanvf-manga-provider",
+  "name": "Scan-VF",
+  "version": "1.0.0",
+  "manifestURI": "https://raw.githubusercontent.com/Xiu991/ScanVFSeanime/main/manifest.json",
+  "language": "typescript",
+  "type": "manga-provider",
+  "description": "Scan-VF - Lire des mangas gratuits en VF. Site #1 pour les scans manga français avec énorme catalogue mis à jour quotidiennement",
+  "author": "Xiu991",
+  "icon": "https://raw.githubusercontent.com/Xiu991/ScanVFSeanime/main/icon.png",
+  "website": "https://www.scan-vf.net",
+  "lang": "fr",
+  "payloadURI": "https://raw.githubusercontent.com/Xiu991/ScanVFSeanime/main/ScanVFProvider.ts",
+  "isDevelopement": false
+}

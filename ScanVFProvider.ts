@@ -68,14 +68,17 @@ class Provider {
                     if (!title || title.length < 2) continue;
                     
                     const matchScore = this.calculateMatchScore(title, normalizedQuery);
-                    if (matchScore > 0.2) {
+                    console.log(`🔍 "${title}" vs "${normalizedQuery}" = ${matchScore.toFixed(2)}`);
+                    
+                    // Seuil ULTRA BAS à 0.05 ou accepter tous si recherche courte
+                    if (matchScore > 0.05 || normalizedQuery.length < 4) {
                         const fullUrl = url.startsWith('http') ? url : this.SITE_URL + url;
                         results.push({
                             id: fullUrl,
                             title: title,
                             url: fullUrl,
                         });
-                        console.log(`✨ Match: "${title}" (${matchScore.toFixed(2)})`);
+                        console.log(`✨ Match accepté!`);
                     }
                 }
             } else {
@@ -93,7 +96,9 @@ class Provider {
                     if (!title || !url) continue;
                     
                     const matchScore = this.calculateMatchScore(title, normalizedQuery);
-                    if (matchScore > 0.2) {
+                    console.log(`🔍 "${title}" score: ${matchScore.toFixed(2)}`);
+                    
+                    if (matchScore > 0.05 || normalizedQuery.length < 4) {
                         const fullUrl = url.startsWith('http') ? url : this.SITE_URL + url;
                         
                         results.push({
@@ -103,7 +108,7 @@ class Provider {
                             image: image ? (image.startsWith('http') ? image : this.SITE_URL + image) : undefined
                         });
                         
-                        console.log(`✨ "${title}" (${matchScore.toFixed(2)})`);
+                        console.log(`✨ Accepté!`);
                     }
                 }
             }

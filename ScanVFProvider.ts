@@ -46,40 +46,56 @@ class Provider {
             const $ = await LoadDoc(html);
             const results: MangaSearchResult[] = [];
             
-            // Scan-VF structure: articles ou divs de manga
-            const mangaItems = $("article.item, div.manga-item, div.bs, article");
+            // DEBUG: Afficher TOUS les sélecteurs possibles
+            console.log(`🔍 DEBUG - Test de tous les sélecteurs:`);
+            console.log(`   article: ${$("article").length()}`);
+            console.log(`   div.item: ${$("div.item").length()}`);
+            console.log(`   div.manga: ${$("div[class*='manga']").length()}`);
+            console.log(`   div.post: ${$("div.post, div[class*='post']").length()}`);
+            console.log(`   a[href*='/manga/']: ${$("a[href*='/manga/']").length()}`);
+            console.log(`   a[href*='/scan/']: ${$("a[href*='/scan/']").length()}`);
+            console.log(`   Tous les liens: ${$("a").length()}`);
+            
+            // Essayer TOUS les sélecteurs possibles
+            const mangaItems = $("article, div.item, div.manga-item, div.bs, div.post, div[class*='manga'], div[class*='post']");
             console.log(`📚 Éléments trouvés: ${mangaItems.length()}`);
             
             if (mangaItems.length() === 0) {
-                console.warn(`⚠️ Essai sélecteurs alternatifs...`);
-                // Fallback: tous les liens vers des mangas
-                const allLinks = $("a[href*='/manga/'], a[href*='/scan/']");
-                console.log(`🔗 Liens fallback: ${allLinks.length()}`);
+                console.warn(`⚠️ Aucun élément avec sélecteurs, essai TOUS LES LIENS...`);
+                
+                // PRENDRE ABSOLUMENT TOUS LES LIENS
+                const allLinks = $("a");
+                console.log(`🔗 Total liens: ${allLinks.length()}`);
                 
                 const seenUrls = new Set<string>();
-                for (let i = 0; i < Math.min(allLinks.length(), 20); i++) {
+                let foundCount = 0;
+                
+                for (let i = 0; i < allLinks.length() && foundCount < 20; i++) {
                     const link = allLinks.eq(i);
                     const url = link.attr("href");
                     
                     if (!url || seenUrls.has(url)) continue;
+                    
+                    // Filtrer seulement URLs qui ressemblent à des mangas
+                    if (!url.includes('/manga') && !url.includes('/scan') && !url.includes('/read')) {
+                        continue;
+                    }
+                    
                     seenUrls.add(url);
                     
                     const title = link.attr("title") || link.text().trim();
                     if (!title || title.length < 2) continue;
                     
-                    const matchScore = this.calculateMatchScore(title, normalizedQuery);
-                    console.log(`🔍 "${title}" vs "${normalizedQuery}" = ${matchScore.toFixed(2)}`);
+                    console.log(`🔍 [${foundCount}] "${title}" -> ${url.substring(0, 50)}...`);
                     
-                    // Seuil ULTRA BAS à 0.05 ou accepter tous si recherche courte
-                    if (matchScore > 0.05 || normalizedQuery.length < 4) {
-                        const fullUrl = url.startsWith('http') ? url : this.SITE_URL + url;
-                        results.push({
-                            id: fullUrl,
-                            title: title,
-                            url: fullUrl,
-                        });
-                        console.log(`✨ Match accepté!`);
-                    }
+                    const fullUrl = url.startsWith('http') ? url : this.SITE_URL + url;
+                    results.push({
+                        id: fullUrl,
+                        title: title,
+                        url: fullUrl,
+                    });
+                    foundCount++;
+                    console.log(`✨ Ajouté (total: ${foundCount})`);
                 }
             } else {
                 // Parse normal
